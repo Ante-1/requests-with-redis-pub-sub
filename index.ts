@@ -5,6 +5,9 @@ const pub = new Redis();
 const subReceiver = new Redis();
 const subSender = new Redis();
 
+///////////////////////////////
+// server
+
 // subscribe to a channel that will receive requests
 subReceiver.subscribe("requests", (err) => {
   if (err) {
@@ -33,6 +36,15 @@ subReceiver.on("message", (channel, message) => {
       pub.publish(channelName, JSON.stringify({ error: error.message }));
     });
 });
+
+async function handleRequest(payload) {
+  await new Promise((resolve) => setTimeout(resolve, 7000));
+
+  return { greeting: "hello, " + payload.name };
+}
+
+////////////////////////////////////
+// client
 
 // send a request to the server
 function sendRequest(payload, timeout = 5000) {
@@ -107,9 +119,3 @@ setTimeout(
       }),
   2000
 );
-
-async function handleRequest(payload) {
-  await new Promise((resolve) => setTimeout(resolve, 7000));
-
-  return { greeting: "hello, " + payload.name };
-}
